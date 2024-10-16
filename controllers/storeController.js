@@ -102,3 +102,17 @@ exports.updateStore = async (req, res) => {
     req.flash('success', `Successfully updated <strong>${store.name}</strong>. <a href="/store/${store.slug}">View store</a>`);
     res.redirect(`/stores/${store._id}/edit`);
 };
+
+exports.searchStores = async (req, res) => {   
+
+    const stores = await Store.find({         
+        $text: { //1er param: query filter -> conditions             
+            $search: req.query.q         
+        }     
+    }, { //2n param: query projection -> fields to include/exclude from the results         
+        score: { $meta: 'textScore' }     
+    }).sort({ //first filter          
+        score: { $meta: 'textScore' }     
+    }).limit(5); //second filter      
+    res.json({ stores, length: stores.length }); 
+}; 

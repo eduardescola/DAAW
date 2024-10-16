@@ -42,3 +42,9 @@ storeSchema.pre('save', async function(next) {
 
 // link “Store” with the storeSchema and make it importable
 module.exports = mongoose.model('Store', storeSchema);
+
+// *********INDEXES********** 
+storeSchema.index({     
+  name: 'text',  //we will search in the name attribute     
+  description: 'text' //we will search in the desc. attribute 
+}); 
