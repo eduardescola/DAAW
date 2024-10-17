@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const router = require('./routes/router');
+const errorHandlers = require('./handlers/errorHandlers');
 
 const session = require('express-session');
 //const mongoose = require('mongoose');
