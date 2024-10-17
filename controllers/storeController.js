@@ -15,7 +15,7 @@ const multerOptions = {
 }; 
 
 const uuid = require('uuid'); 
-const jimp = require('jimp');
+const { Jimp } = require('jimp'); 
 
 //MIDLEWARE FUNCTION for CREATE STORE 
 exports.verify = multer(multerOptions).single('photo');
