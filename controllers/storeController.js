@@ -103,6 +103,7 @@ exports.updateStore = async (req, res) => {
     res.redirect(`/stores/${store._id}/edit`);
 };
 
+
 exports.searchStores = async (req, res) => {   
 
     const stores = await Store.find({         

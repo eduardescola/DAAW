@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  .container
+    h1 Todos los Restaurantes
+    .map-container(style="height: 600px;")
+      #map(style="width: 100%; height: 100%;")
+
+  script.
+    var map = L.map('map').setView([40.416775, -3.703790], 12); // Coordenadas iniciales (por ejemplo, Madrid)
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/%7Bz%7D/%7Bx%7D/%7By%7D.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var stores = !{JSON.stringify(stores)};
+    stores.forEach(function(store) {
+      L.marker([store.latitude, store.longitude]).addTo(map)
+        .bindPopup('<b>' + store.name + '</b><br>Valoración: ' + store.rating);
+    });
