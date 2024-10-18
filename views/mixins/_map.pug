@@ -1,0 +1,30 @@
+mixin map(id, latitude, longitude, name, rating)
+  .map-container(style="height: 400px; margin-top: 10px;")
+    div(id=id, style="width: 100%; height: 100%;")
+  
+  script.
+    (function() {
+      var mapId = '#{id}';
+      var lat = #{latitude};
+      var lng = #{longitude};
+      var storeName = '#{name}';
+      var storeRating = '#{rating}';
+
+      function initMap() {
+        var map = L.map(mapId).setView([lat, lng], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        L.marker([lat, lng]).addTo(map)
+          .bindPopup('<b>' + storeName + '</b><br>Valoración: ' + storeRating)
+          .openPopup();
+      }
+
+      if (document.readyState === 'complete') {
+        initMap();
+      } else {
+        window.addEventListener('load', initMap);
+      }
+    })();

@@ -6,6 +6,8 @@ html
     link(rel='stylesheet', href='/css/bootstrap.min.css')
     link(rel='icon', href='data:;base64,iVBORw0KGgo=')
     meta(name="viewport" content="width=device-width, initial-scale=1")
+    // Leaflet CSS
+    link(rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css")
   body
     block header
       nav.navbar.navbar-expand-sm.bg-body-tertiary(data-bs-theme="dark")
@@ -40,3 +42,5 @@ html
       script(src="/dist/jquery-3.7.1.min.js")
       script(src="/dist/bootstrap.bundle.min.js")
       script(src="/dist/app.bundle.js")
+       // Leaflet JS
+      script(src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js")

@@ -17,6 +17,14 @@ const storeSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  latitude: {
+    type: Number,
+    required: 'Please enter the latitude!'
+  },
+  longitude: {
+    type: Number,
+    required: 'Please enter the longitude!'
+  },
   tags: [String],  // array of strings
   created: {
     type: Date,

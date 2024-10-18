@@ -5,6 +5,8 @@ const storeController = require('../controllers/storeController');
 
 router.get('/index/', storeController.homePage);
 
+router.get('/stores-map', storeController.getStoresMap);
+
 //1st step ADD STORE -> show the form 
 router.get('/add/', storeController.addStore); 
 

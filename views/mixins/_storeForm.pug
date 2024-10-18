@@ -15,6 +15,12 @@ mixin storeForm(store = {})
       label(for="address" class="form-label") Address
       input(class="form-control" type="text" id="address" name="address" value=store.address required)
     .mb-3
+      label(for="latitude" class="form-label") Latitude
+      input(class="form-control" type="text" id="latitude" name="latitude" value=store.latitude required)
+    .mb-3
+      label(for="longitude" class="form-label") Longitude
+      input(class="form-control" type="text" id="longitude" name="longitude" value=store.longitude required)  
+    .mb-3
       label(for="tags" class="form-label") Options:
     .mb-3.form-check
       - const choices = ['Wifi', 'Open Late', 'Family Friendly', 'Vegan']
