@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { catchErrors } = require('../handlers/errorHandlers'); 
 const storeController = require('../controllers/storeController');
+const userController = require('../controllers/userController');
+const authController = require('../controllers/authController');
+//LOG OUT
+router.get('/logout', authController.logout);
 
 router.get('/index/', storeController.homePage);
 
@@ -42,6 +46,36 @@ router.post('/add/:id',
     catchErrors(storeController.upload),    
     catchErrors(storeController.updateStore) 
 ); 
+
+//1st step SIGN-UP a USER -> show the form
+router.get('/register', userController.registerForm);
+
+//2nd step SIGN-UP a USER -> validate, register, login
+router.post('/register',
+    userController.validationRules(),
+    userController.validationCustomRules(),
+    userController.validateRegister,
+    userController.register,
+    authController.login
+);
+
+//1st step LOG IN -> show the form
+router.get('/login', authController.loginForm);
+
+//2nd step LOG IN -> do the login
+router.post('/login', authController.login);
+
+// SHOW ACCOUNT
+router.get('/account',
+    authController.isLoggedIn,
+    userController.account
+);
+
+// EDIT ACCOUNT
+router.post('/account',
+    authController.isLoggedIn,
+    catchErrors(userController.updateAccount)
+);
 
 //***API REST --> Functions to be consumed by the front end via AJAX  
 
