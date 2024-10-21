@@ -29,7 +29,12 @@ router.get('/store/:slug', catchErrors(storeController.getStoreBySlug));
 router.get('/stores', catchErrors(storeController.getStores));
 
 //1st step EDIT STORE -> show the form with current data 
-router.get('/stores/:id/edit', catchErrors(storeController.editStore));   
+router.get('/stores/:id/edit', catchErrors(storeController.editStore));
+
+// SHOW all TAGs
+router.get('/tags', catchErrors(storeController.getStoresByTag));
+//SHOW a certain TAG
+router.get('/tags/:tag', catchErrors(storeController.getStoresByTag)); 
 
 //2nd step EDIT STORE -> receive the updated data 
 router.post('/add/:id',   
