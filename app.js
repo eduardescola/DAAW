@@ -2,6 +2,9 @@ const express = require('express');
 const path = require('path');
 const router = require('./routes/router');
 const errorHandlers = require('./handlers/errorHandlers');
+const passport = require('passport');
+
+require('./handlers/passport');
 
 const session = require('express-session');
 //const mongoose = require('mongoose');
@@ -57,6 +60,12 @@ if (app.get('env') === 'development') {
     /* Development Error Handler - Prints stack trace */
     app.use(errorHandlers.developmentErrors);
 }
+
+// Passport JS is what we use to handle our logins
+app.use(passport.initialize());
+app.use(passport.session());
+
+res.locals.user = req.user || null; 
 
 /* production error handler */
 app.use(errorHandlers.productionErrors);
