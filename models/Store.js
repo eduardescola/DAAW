@@ -48,9 +48,6 @@ storeSchema.pre('save', async function(next) {
   next(); // follow the PIPELINE -> do the SAVE
 });
 
-// link “Store” with the storeSchema and make it importable
-module.exports = mongoose.model('Store', storeSchema);
-
 storeSchema.statics.getTagsList = function() {
   return this.aggregate([
   { $unwind: '$tags' },
@@ -64,3 +61,6 @@ storeSchema.index({
   name: 'text',  //we will search in the name attribute     
   description: 'text' //we will search in the desc. attribute 
 }); 
+
+// link “Store” with the storeSchema and make it importable
+module.exports = mongoose.model('Store', storeSchema);

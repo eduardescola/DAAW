@@ -43,6 +43,7 @@ app.use((req, res, next) => {
     res.locals.h = helpers;
     res.locals.flashes = req.flash();
     res.locals.currentPath = req.path;
+    res.locals.user = req.user || null;
     next();  // Go to the next middleware in the REQ-RES CYCLE
 });
 
@@ -65,7 +66,7 @@ if (app.get('env') === 'development') {
 app.use(passport.initialize());
 app.use(passport.session());
 
-res.locals.user = req.user || null; 
+ 
 
 /* production error handler */
 app.use(errorHandlers.productionErrors);
