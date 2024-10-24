@@ -34,4 +34,5 @@ block content
                       each slot in store.timeSlots
                         option(value=slot.end) #{slot.end}
           button(type="submit" class="btn btn-primary") Reserve
-    +map(`map-${store._id}`, store.latitude, store.longitude, store.name, store.rating)
+    .mb-5
+      +map(`map-${store._id}`, store.latitude, store.longitude, store.name, store.rating)
