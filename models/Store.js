@@ -30,7 +30,18 @@ const storeSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  photo: String
+  photo: String,
+  author: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+    required: 'You must supply an author'
+  },
+  closedDays: [String], // Días en los que el restaurante está cerrado
+  timeSlots: [{
+    start: String,
+    end: String,
+    maxReservations: Number
+  }] // Franjas horarias y número máximo de reservas por franja
 });
 
 // ********PRE-SAVE HOOK*********

@@ -6,4 +6,20 @@ mixin storeCard(store = {})
         h5.card-title
           a(href=`/store/${store.slug}` style="color:black") #{store.name}
         p.card-text= store.description.split(' ').slice(0, 15).join(' ')
-        a.mt-auto.btn.btn-primary(href=`/stores/${store._id}/edit`) Edit
+        if store.closedDays && store.closedDays.length
+          p.card-text
+            strong Closed Days:
+            ul
+              each day in store.closedDays
+                li= day
+        if store.timeSlots && store.timeSlots.length
+          p.card-text
+            strong Time Slots:
+            ul
+              each slot in store.timeSlots
+                li
+                  | #{slot.start} - #{slot.end} (Max Reservations: #{slot.maxReservations})
+        if user && (user._id == store.author || user.role === 'admin')
+          a.mt-auto.btn.btn-primary(href=`/stores/${store._id}/edit`) Edit
+          form(action=`/stores/${store._id}?_method=DELETE` method="POST" style="margin-top: 10px;")
+            button(type="submit" class="btn btn-danger") Delete

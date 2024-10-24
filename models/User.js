@@ -19,6 +19,11 @@ const userSchema = new Schema({
     },
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+      }
 });
 userSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
 

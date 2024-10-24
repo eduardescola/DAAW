@@ -3,14 +3,13 @@ const path = require('path');
 const router = require('./routes/router');
 const errorHandlers = require('./handlers/errorHandlers');
 const passport = require('passport');
-
-require('./handlers/passport');
-
 const session = require('express-session');
 //const mongoose = require('mongoose');
 const MongoStore = require('connect-mongo');
 const helpers = require('./helpers');
 const flash = require('connect-flash');
+
+require('./handlers/passport');
 
 // create our Express app
 const app = express();
@@ -37,13 +36,17 @@ app.use(session({
     })
 }));
 
+// Passport JS is what we use to handle our logins
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(flash());
 
 app.use((req, res, next) => {
+    res.locals.user = req.user || null;
     res.locals.h = helpers;
     res.locals.flashes = req.flash();
     res.locals.currentPath = req.path;
-    res.locals.user = req.user || null;
     next();  // Go to the next middleware in the REQ-RES CYCLE
 });
 
@@ -61,12 +64,6 @@ if (app.get('env') === 'development') {
     /* Development Error Handler - Prints stack trace */
     app.use(errorHandlers.developmentErrors);
 }
-
-// Passport JS is what we use to handle our logins
-app.use(passport.initialize());
-app.use(passport.session());
-
- 
 
 /* production error handler */
 app.use(errorHandlers.productionErrors);

@@ -1,6 +1,7 @@
 const multer = require('multer'); 
 const mongoose = require('mongoose');
 const Store = mongoose.model('Store'); 
+const Reservation = mongoose.model('Reservation');
 
 const multerOptions = { 
     storage: multer.memoryStorage(), 
@@ -35,6 +36,13 @@ exports.addStore = (req, res) => {   //same template is used to create and to ed
 
 }; 
 
+exports.deleteStore = async (req, res) => {
+    const { id } = req.params;
+    await Store.findByIdAndDelete(id);
+    req.flash('success', 'Store deleted successfully');
+    res.redirect('/stores');
+  };
+
 //MIDLEWARE FUNCTION for CREATE STORE 
 exports.upload = async (req, res, next) => {     
     //check if there is no new file to resize     
@@ -57,7 +65,8 @@ exports.upload = async (req, res, next) => {
     next(); 
 }; 
 
-exports.createStore = async (req, res) => {   
+exports.createStore = async (req, res) => {  
+    req.body.author = req.user._id; 
     const store = new Store(req.body);   
     const savedStore = await store.save();   
     console.log('Store saved!');    
@@ -96,7 +105,7 @@ exports.editStore = async (req, res) => {
 exports.updateStore = async (req, res) => {
     // find and update the store
     const store = await Store.findOneAndUpdate(
-      { _id: req.params.id },
+      { _id: req.params.id, author: req.user._id },
       req.body,
       {
         new: true, // return new store instead of old one

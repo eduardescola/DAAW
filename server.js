@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 require('dotenv').config({ path: 'variables.env' });
 require('./models/Store');
 require('./models/User');
+require('./models/Reservation');
 
 // Connect to our Database and handle any bad connections
 mongoose.connect(process.env.DATABASE).then(()=>{

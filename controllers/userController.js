@@ -52,6 +52,15 @@ exports.register = async (req, res, next) => {
     next(); //go to the next middleware
 };
 
+exports.isAdmin = (req, res, next) => {
+    if (req.user && req.user.role === 'admin') {
+      next();
+    } else {
+      req.flash('error', 'You do not have permission to perform this action');
+      res.redirect('/');
+    }
+  };
+
 exports.account = (req, res) => {
     res.render('account', {title: 'Edit your account'});
 };

@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  .container
+    h2 My Reservations
+    if reservations.length
+      ul
+        each reservation in reservations
+          li
+            p
+              | #{reservation.store.name} - #{reservation.date.toDateString()} - #{reservation.timeSlot.start} to #{reservation.timeSlot.end}
+              form(action=`/reservations/${reservation._id}?_method=DELETE` method="POST")
+                button(type="submit" class="btn btn-danger") Cancel
+    else
+      p You have no reservations.

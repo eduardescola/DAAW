@@ -17,4 +17,21 @@ block content
             if store.tags
               each tag in store.tags
                 a.badge.bg-light.text-primary(href=`/tags/${tag}`) ##{tag}
+            if user
+              .reservation-form
+                h3 Make a Reservation
+                form(action="/reservations" method="POST")
+                  input(type="hidden" name="storeId" value=store._id)
+                  .mb-3
+                    label(for="date" class="form-label") Date
+                    input(class="form-control" type="date" name="date" required)
+                  .mb-3
+                    label(for="timeSlot" class="form-label") Time Slot
+                    select(class="form-control" name="timeSlot[start]" required)
+                      each slot in store.timeSlots
+                        option(value=slot.start) #{slot.start}
+                    select(class="form-control" name="timeSlot[end]" required)
+                      each slot in store.timeSlots
+                        option(value=slot.end) #{slot.end}
+          button(type="submit" class="btn btn-primary") Reserve
     +map(`map-${store._id}`, store.latitude, store.longitude, store.name, store.rating)

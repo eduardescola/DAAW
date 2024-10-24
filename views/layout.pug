@@ -23,6 +23,11 @@ html
                 li.nav-item
                   a.nav-link(href=`${item.slug}`)
                     span #{item.title}
+            if user
+              li.nav-item
+                a.nav-link(href='/reservations')
+                  i.fa.fa-calendar(style="padding-right:5px")
+                  span Reservations
             .form-inline
               input.form-control.mr-sm-2(type="text" placeholder="Coffee, beer..." name="search")
               .search__results
@@ -35,17 +40,16 @@ html
                 li.nav-item
                   a.nav-link(href='/logout')
                     i.fa.fa-sign-out(style="padding-right:5px")
-                    |Log Out
+                    | Log Out
               else
-                li.nav-item
-                  a.nav-link(href='/register')
-                    i.fa.fa-user(style="padding-right:5px")
-                    |Sign Up
                 li.nav-item
                   a.nav-link(href='/login')
                     i.fa.fa-sign-in(style="padding-right:5px")
-                    |Login
-
+                    | Login
+                li.nav-item
+                  a.nav-link(href='/register')
+                    i.fa.fa-user-plus(style="padding-right:5px")
+                    | Register
     .content
       block messages
         .flashes
@@ -55,12 +59,11 @@ html
               each message in flashes[category]
                 .alert(class=`${category}`)
                   != message
-                  span.closebtn(onClick="this.parentElement.remove()") &times;
-      block content
-
+                  span.closebtn(onClick="this.parentElement.remove()") &times;       
+    block content
+    // Leaflet JS
+    script(src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js")
     block scripts
       script(src="/dist/jquery-3.7.1.min.js")
       script(src="/dist/bootstrap.bundle.min.js")
       script(src="/dist/app.bundle.js")
-       // Leaflet JS
-      script(src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js")
