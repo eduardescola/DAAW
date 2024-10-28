@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Reservation = mongoose.model('Reservation');
 const Store = mongoose.model('Store');
 
+
 exports.createReservation = async (req, res) => {
   const { storeId, date, timeSlot } = req.body;
   const store = await Store.findById(storeId);
@@ -79,4 +80,5 @@ exports.finalizeExpiredReservations = async (req, res) => {
   }
     
   res.redirect('/reservations'); // Redirige a la página de reservas después de la operación
+  next();
 };
