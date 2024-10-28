@@ -82,7 +82,11 @@ router.post('/account',
 
 // Rutas para las reservas
 router.post('/reservations', authController.isLoggedIn, catchErrors(reservationController.createReservation));
-router.get('/reservations', authController.isLoggedIn, catchErrors(reservationController.getReservations));
+router.get('/reservations', 
+    authController.isLoggedIn, 
+    catchErrors(reservationController.finalizeExpired), 
+    catchErrors(reservationController.getReservations)
+  );
 router.delete('/reservations/:id', authController.isLoggedIn, catchErrors(reservationController.cancelReservation));
 
 router.post('/reviews/:id',

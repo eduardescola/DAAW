@@ -153,6 +153,6 @@ exports.getTopStores = async (req, res) => {
 //*** Verify Credentials
 const confirmOwner = (store, user) => {
     if (!(store.author == user._id || user.role === 'admin')) {
-    throw Error('You must own the store in order to edit it');
+        throw Error('You must own the store in order to edit it');
     }
 };
