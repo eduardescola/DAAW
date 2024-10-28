@@ -1,6 +1,8 @@
 extends layout
 
 include mixins/_map
+include mixins/_reviewForm
+include mixins/_review
 
 block content
   .container
@@ -34,5 +36,18 @@ block content
                       each slot in store.timeSlots
                         option(value=slot.end) #{slot.end}
           button(type="submit" class="btn btn-primary") Reserve
+          if user
+              .no-gutters.row
+                  .pt-3.lg-2.col-lg-12
+                      .card
+                          .card-body
+                              +reviewForm(store)
+          if store.reviews
+              each r in store.reviews
+                  .no-gutters.row
+                      .pt-3.lg-2.col-lg-12
+                          .card
+                              .card-body
+                                  +review(r)
     .mb-5
       +map(`map-${store._id}`, store.latitude, store.longitude, store.name, store.rating)

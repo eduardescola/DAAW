@@ -19,7 +19,7 @@ mixin storeCard(store = {})
               each slot in store.timeSlots
                 li
                   | #{slot.start} - #{slot.end} (Max Reservations: #{slot.maxReservations})
-        if user && (user._id == store.author || user.role === 'admin')
+        if user && (store.author.equals(user._id) || user.role === 'admin')
           a.mt-auto.btn.btn-primary(href=`/stores/${store._id}/edit`) Edit
           form(action=`/stores/${store._id}?_method=DELETE` method="POST" style="margin-top: 10px;")
             button(type="submit" class="btn btn-danger") Delete

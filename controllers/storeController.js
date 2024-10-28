@@ -98,6 +98,7 @@ exports.getStoresMap = async (req, res) => {
   };
 
 exports.editStore = async (req, res) => {
+    confirmOwner(store, req.user);
     const store = await Store.findOne({ _id: req.params.id });
     res.render('editStore', { title: `Edit ${store.name}`, store: store });
   };
@@ -143,3 +144,15 @@ exports.searchStores = async (req, res) => {
     }).limit(5); //second filter      
     res.json({ stores, length: stores.length }); 
 }; 
+
+exports.getTopStores = async (req, res) => {
+    const stores = await Store.getTopStores();
+    res.render('topStores', { stores, title: 'Top Stores'});
+};
+
+//*** Verify Credentials
+const confirmOwner = (store, user) => {
+    if (!store.author.equals(user._id)) {
+    throw Error('You must own the store in order to edit it');
+    }
+};

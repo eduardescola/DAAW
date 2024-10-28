@@ -44,6 +44,13 @@ const storeSchema = new mongoose.Schema({
   }] // Franjas horarias y número máximo de reservas por franja
 });
 
+storeSchema.virtual('reviews', {
+  ref: 'Review', // foreign model -> REVIEW
+  //which FIELD on our STORE needs to match up with which field on the foreing model
+  localField: '_id',
+  foreignField: 'store'
+ });
+
 // ********PRE-SAVE HOOK*********
 storeSchema.pre('save', async function(next) {
   if (!this.isModified('name')) {
@@ -65,6 +72,40 @@ storeSchema.statics.getTagsList = function() {
   { $group: {_id: '$tags', count: { $sum: 1 } } },
   { $sort: { count: -1 } }
   ]);
+ };
+
+// ********PRE-FIND HOOKs******** --> populate virtual field REVIEWs
+function autopopulate(next) {
+  this.populate('reviews');
+  next();
+}
+
+storeSchema.pre('find', autopopulate);
+storeSchema.pre('findOne', autopopulate);
+
+storeSchema.statics.getTopStores = function() {
+    return this.aggregate([
+      { $lookup: {
+        from: 'reviews',
+        localField: '_id',
+        foreignField: 'store',
+        as: 'reviews'
+        }
+      },
+      { $match: {
+        'reviews.1': { $exists: true}
+        }
+      },
+      { $addFields: {
+        averageRating: {$avg: '$reviews.rating'}
+        }
+      },
+      { $sort: {
+        averageRating: -1
+        }
+      },
+      { $limit: 10 }
+    ]);
  };
 
 // *********INDEXES********** 

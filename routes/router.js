@@ -5,6 +5,7 @@ const storeController = require('../controllers/storeController');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
 const reservationController = require('../controllers/reservationController');
+const reviewController = require('../controllers/reviewController');
 
 //LOG OUT
 router.get('/logout', authController.logout);
@@ -83,6 +84,27 @@ router.post('/account',
 router.post('/reservations', authController.isLoggedIn, catchErrors(reservationController.createReservation));
 router.get('/reservations', authController.isLoggedIn, catchErrors(reservationController.getReservations));
 router.delete('/reservations/:id', authController.isLoggedIn, catchErrors(reservationController.cancelReservation));
+
+router.post('/reviews/:id',
+    authController.isLoggedIn,
+    catchErrors(reviewController.addReview)
+);
+
+//SHOW TOP STORES
+router.get('/top', catchErrors(storeController.getTopStores));
+
+//RECEIVE FORGOT ACCOUNT ACTION
+router.post('/account/forgot', catchErrors(authController.forgot));
+
+//1st step RESET PASSWD -> show the form
+router.get('/account/reset/:token', catchErrors(authController.reset));
+
+//2nd step RESET PASSWD -> change passwd
+router.post('/account/reset/:token',
+    authController.validationCustomRules(),
+    authController.validatePassUpdate,
+    catchErrors(authController.updatePassword)
+);
 
 //***API REST --> Functions to be consumed by the front end via AJAX  
 
