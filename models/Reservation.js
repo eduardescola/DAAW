@@ -2,34 +2,24 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-const timeSlotSchema = new mongoose.Schema({
-  start: {
-    type: String,
-    required: [true, 'You must supply a start time']
-  },
-  end: {
-    type: String,
-    required: [true, 'You must supply an end time']
-  }
-});
-
 const reservationSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',
-    required: [true, 'You must supply a time slot'],
+    required: [true, 'You must supply a user'],
   },
   store: {
     type: mongoose.Schema.ObjectId,
     ref: 'Store',
-    required: [true, 'You must supply a time slot'],
+    required: [true, 'You must supply a store'],
   },
   date: {
     type: Date,
-    required: [true, 'You must supply a time slot'],
+    required: [true, 'You must supply a date'],
   },
   timeSlot: {
-    type: timeSlotSchema,
+    type: mongoose.Schema.ObjectId,
+    ref: 'TimeSlot', // Cambiamos a referencia al modelo TimeSlot
     required: [true, 'You must supply a time slot']
   },
   created: {
