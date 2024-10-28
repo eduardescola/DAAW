@@ -22,6 +22,11 @@ const reservationSchema = new mongoose.Schema({
     ref: 'TimeSlot', // Cambiamos a referencia al modelo TimeSlot
     required: [true, 'You must supply a time slot']
   },
+  status: {
+    type: String,
+    enum: ['activa', 'finalizada'], // Limita los estados a estos dos
+    default: 'activa', // Estado por defecto
+  },
   created: {
     type: Date,
     default: Date.now
