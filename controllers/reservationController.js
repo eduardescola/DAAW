@@ -56,14 +56,14 @@ exports.cancelReservation = async (req, res) => {
   res.redirect('/reservations');
 };
 
-exports.finalizeExpiredReservations = async (req, res) => {
+exports.finalizeExpiredReservations = async (req, res, next) => {
   // Obtiene la fecha actual
   const now = new Date();
 
   // Busca las reservas cuya fecha es anterior a la fecha actual y que aún están activas
   const expiredReservations = await Reservation.find({
     date: { $lt: now },
-    status: 'activa'
+    status: 'active'
   });
 
   // Actualiza el estado de cada reserva a "finalizada"
@@ -79,6 +79,6 @@ exports.finalizeExpiredReservations = async (req, res) => {
      req.flash('info', 'No hay reservas expiradas para finalizar.');
   }
     
-  res.redirect('/reservations'); // Redirige a la página de reservas después de la operación
-  next();
+  next(); // Pasa al siguiente middleware
+
 };
