@@ -8,6 +8,10 @@ const timeSlotSchema = new mongoose.Schema({
   end: {
     type: String,
     required: [true, 'You must supply an end time']
+  },
+  maxReservations: {
+    type: Number,
+    required: [true, 'You must supply a maximum number of reservations']
   }
 });
 
