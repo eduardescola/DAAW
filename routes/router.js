@@ -31,6 +31,10 @@ router.get('/store/:slug', catchErrors(storeController.getStoreBySlug));
 // SHOW all STOREs 
 router.get('/stores', catchErrors(storeController.getStores));
 
+// SHOW all STOREs with PAGINATION
+router.get('/stores/page/:page', catchErrors(storeController.getStores));
+
+
 //1st step EDIT STORE -> show the form with current data 
 router.get('/stores/:id/edit', authController.isLoggedIn, catchErrors(storeController.editStore));
 
