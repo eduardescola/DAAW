@@ -127,19 +127,50 @@ exports.editStore = async (req, res) => {
 };
   
 exports.updateStore = async (req, res) => {
-    // find and update the store
-    const store = await Store.findOneAndUpdate(
-      { _id: req.params.id, author: req.user._id },
-      req.body,
-      {
-        new: true, // return new store instead of old one
-        runValidators: true
-      }
-    ).exec();
-  
-    req.flash('success', `Successfully updated <strong>${store.name}</strong>. <a href="/store/${store.slug}">View store</a>`);
-    res.redirect(`/stores/${store._id}/edit`);
+    try {
+        // Verificar si el usuario es un administrador o el dueño de la tienda
+        const store = await Store.findOne({ _id: req.params.id });
+
+        // Si no se encuentra la tienda, devolver un error 404
+        if (!store) {
+            req.flash('error', 'La tienda no fue encontrada.');
+            return res.redirect('/stores');
+        }
+
+        // Si el usuario no es administrador, asegurarse de que es el dueño de la tienda
+        if (req.user.role !== 'admin' && store.author.toString() !== req.user._id.toString()) {
+            req.flash('error', 'No tienes permiso para editar esta tienda.');
+            return res.redirect(`/stores/${store._id}`);
+        }
+
+        // Si el usuario tiene permiso (es el dueño o admin), proceder con la actualización
+        const updatedStore = await Store.findOneAndUpdate(
+            { _id: req.params.id },
+            req.body,
+            {
+                new: true, // Devolver el objeto actualizado
+                runValidators: true // Ejecutar las validaciones del modelo
+            }
+        ).exec();
+
+        // Si no se ha actualizado, devolver un mensaje de error
+        if (!updatedStore) {
+            req.flash('error', 'No se pudo actualizar la tienda.');
+            return res.redirect(`/stores/${store._id}/edit`);
+        }
+
+        // Si la actualización es exitosa, mostrar mensaje de éxito
+        req.flash('success', `Se actualizó correctamente <strong>${updatedStore.name}</strong>. <a href="/store/${updatedStore.slug}">Ver tienda</a>`);
+        res.redirect(`/stores/${updatedStore._id}/edit`);
+
+    } catch (error) {
+        console.error(error);
+        req.flash('error', 'Ocurrió un error al actualizar la tienda.');
+        res.redirect(`/stores/${req.params.id}/edit`);
+    }
 };
+
+
 
 exports.getStoresByTag = async (req, res) => {
     const tag = req.params.tag;

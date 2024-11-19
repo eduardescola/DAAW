@@ -41,20 +41,21 @@ mixin storeForm(store = {})
       label(for="timeSlots" class="form-label") Time Slots
       .time-slots
         .time-slot-template.hidden
-          .mb-3
-            label(for="timeSlot" class="form-label") Time Slot
-            select(class="form-control" name="timeSlots[][slot][]" onchange="checkDuplicateSlots(this)")
-              option(value="") Select a time slot
-              option(value="09:00-11:00") 09:00 - 11:00
-              option(value="11:00-13:00") 11:00 - 13:00
-              option(value="13:00-15:00") 13:00 - 15:00
-              option(value="15:00-17:00") 15:00 - 17:00
-              option(value="17:00-19:00") 17:00 - 19:00
-              option(value="19:00-21:00") 19:00 - 21:00
-          .mb-3
-            label(for="timeSlotMaxReservations" class="form-label") Max Reservations
-            input(class="form-control" type="number" name="timeSlots[][maxReservations]" required)
-          button(type="button" class="btn btn-danger remove-time-slot") Remove
+          .time-slot  <!-- Asegúrate de envolver cada bloque de tiempo en una clase 'time-slot' -->
+            .mb-3
+              label(for="timeSlot" class="form-label") Time Slot
+              select(class="form-control" name="timeSlots[][slot][]" onchange="checkDuplicateSlots(this)")
+                option(value="") Select a time slot
+                option(value="09:00-11:00") 09:00 - 11:00
+                option(value="11:00-13:00") 11:00 - 13:00
+                option(value="13:00-15:00") 13:00 - 15:00
+                option(value="15:00-17:00") 15:00 - 17:00
+                option(value="17:00-19:00") 17:00 - 19:00
+                option(value="19:00-21:00") 19:00 - 21:00
+            .mb-3
+              label(for="timeSlotMaxReservations" class="form-label") Max Reservations
+              input(class="form-control" type="number" name="timeSlots[][maxReservations]" required)
+            button(type="button" class="btn btn-danger remove-time-slot") Remove
         button(type="button" class="btn btn-primary add-time-slot") Add Time Slot
     button(type="submit" class="btn btn-primary") Save
 
@@ -64,19 +65,23 @@ mixin storeForm(store = {})
       const timeSlotsContainer = document.querySelector('.time-slots');
       const addTimeSlotButton = document.querySelector('.add-time-slot');
 
+      // Añadir un nuevo slot de tiempo
       addTimeSlotButton.addEventListener('click', function() {
         const newTimeSlot = timeSlotTemplate.cloneNode(true);
         newTimeSlot.classList.remove('hidden', 'time-slot-template');
+        newTimeSlot.classList.add('time-slot'); // Añadimos la clase 'time-slot' al nuevo slot
         timeSlotsContainer.insertBefore(newTimeSlot, addTimeSlotButton);
       });
 
+      // Eliminar un slot de tiempo
       timeSlotsContainer.addEventListener('click', function(event) {
         if (event.target.classList.contains('remove-time-slot')) {
-          event.target.closest('.time-slot').remove();
+          event.target.closest('.time-slot').remove();  // Asegúrate de que el 'closest' sea '.time-slot'
         }
       });
     });
 
+    // Verificar si hay slots duplicados
     function checkDuplicateSlots(selectElement) {
       const selectedValue = selectElement.value;
       const allSelects = document.querySelectorAll('select[name^="timeSlots"]');
