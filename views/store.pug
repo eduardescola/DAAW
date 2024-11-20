@@ -29,20 +29,17 @@ block content
                     input(class="form-control" type="date" name="date" required)
                   .mb-3
                     label(for="timeSlot" class="form-label") Time Slot
-                    select(class="form-control" name="timeSlot[start]" required)
+                    select(class="form-control" name="timeSlot" required)
                       each slot in store.timeSlots
-                        option(value=slot.start) #{slot.start}
-                    select(class="form-control" name="timeSlot[end]" required)
-                      each slot in store.timeSlots
-                        option(value=slot.end) #{slot.end}
-          button(type="submit" class="btn btn-primary") Reserve
+                        option(value=`${slot._id}`) #{slot.start} - #{slot.end}
+                  button(type="submit" class="btn btn-primary") Reserve
           if user
               .no-gutters.row
                   .pt-3.lg-2.col-lg-12
                       .card
                           .card-body
                               +reviewForm(store)
-          if store.reviews
+          if store.reviews && store.reviews.length
               each r in store.reviews
                   .no-gutters.row
                       .pt-3.lg-2.col-lg-12

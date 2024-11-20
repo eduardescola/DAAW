@@ -112,15 +112,14 @@ exports.createStore = async (req, res) => {
     }
 };
 
-exports.getStoreBySlug = async (req, res, next) => {    
-    const store = await Store.findOne({ slug: req.params.slug });    
+exports.getStoreBySlug = async (req, res, next) => {
+    const store = await Store.findOne({ slug: req.params.slug }).populate('timeSlots');
     
-    // If no store -> DB send a NULL -> do nothing and follow the pipeline   
-    if (!store) {     
-        next();     
-        return;   
-    }    
-    res.render('store', { title: `Store ${store.name}`, store: store}); 
+    if (!store) {
+        return next();
+    }
+
+    res.render('store', { title: store.name, store });
 }; 
 
 exports.getStores = async (req, res) => {
