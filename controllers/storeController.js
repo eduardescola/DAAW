@@ -70,19 +70,46 @@ exports.createStore = async (req, res) => {
     req.body.author = req.user._id;
     const store = new Store(req.body);
 
-    // Crear los timeSlots asociados
-    if (req.body.timeSlots) {
-        const timeSlots = await Promise.all(req.body.timeSlots.map(async (slot) => {
-            const newSlot = new TimeSlot(slot);
-            await newSlot.save();
-            return newSlot._id;
-        }));
-        store.timeSlots = timeSlots;
-    }
+    try {
+        if (req.body.timeSlots) {
+            let timeSlots = req.body.timeSlots;
+            if (!Array.isArray(timeSlots.slot)) {
+                timeSlots.slot = [timeSlots.slot];
+                timeSlots.maxReservations = [timeSlots.maxReservations];
+            }
 
-    const savedStore = await store.save();
-    req.flash('success', `Successfully Created ${store.name}.`);
-    res.redirect(`/store/${savedStore.slug}`);
+            // Asegurarse de que maxReservations tenga el mismo número de elementos que slots
+            if (timeSlots.slot.length !== timeSlots.maxReservations.length) {
+                const firstMaxReservation = timeSlots.maxReservations[0] || '0';
+                // Rellenar maxReservations con el valor del primero si es necesario
+                while (timeSlots.maxReservations.length < timeSlots.slot.length) {
+                    timeSlots.maxReservations.push(firstMaxReservation);
+                }
+            }
+
+            timeSlots = timeSlots.slot.map((slot, index) => ({
+                start: slot.split('-')[0],
+                end: slot.split('-')[1],
+                maxReservations: Number(timeSlots.maxReservations[index])
+            }));
+
+            const savedTimeSlots = await Promise.all(timeSlots.map(async (slot) => {
+                const newSlot = new TimeSlot(slot);
+                await newSlot.save();
+                return newSlot._id;
+            }));
+
+            store.timeSlots = savedTimeSlots;
+        }
+
+        const savedStore = await store.save();
+        req.flash('success', `Successfully Created ${store.name}.`);
+        res.redirect(`/store/${savedStore.slug}`);
+    } catch (err) {
+        console.error('Error timeSlots:', err);
+        req.flash('error', 'Uno o más intervalos de tiempo no se pudieron guardar.');
+        res.redirect('back');
+    }
 };
 
 exports.getStoreBySlug = async (req, res, next) => {    
@@ -105,16 +132,16 @@ exports.getStores = async (req, res) => {
         .find() //look for ALL
         .skip(skip) //Skip items of former pages
         .limit(limit) //Take the desired number of items
-        .sort({ created: 'desc' }); //sort them
+        .sort({ created: 'desc' }) //sort them
+        .populate('timeSlots'); // Populate timeSlots
 
     const countPromise = Store.countDocuments();
     
-    const [stores, count] = await Promise.all([storesPromise,countPromise]);
+    const [stores, count] = await Promise.all([storesPromise, countPromise]);
     
     const pages = Math.ceil(count / limit);
     if (!stores.length && skip) {
-        req.flash('info', `You asked for page ${page}. But that does not exist. So
-        I put you on page ${pages}`);
+        req.flash('info', `You asked for page ${page}. But that does not exist. So I put you on page ${pages}`);
         res.redirect(`/stores/page/${pages}`);
         return;
     }
@@ -139,25 +166,49 @@ exports.updateStore = async (req, res) => {
     try {
         const store = await Store.findOne({ _id: req.params.id });
 
-        if (!store) {
-            req.flash('error', 'La tienda no fue encontrada.');
-            return res.redirect('/stores');
-        }
-
         if (req.user.role !== 'admin' && store.author.toString() !== req.user._id.toString()) {
             req.flash('error', 'No tienes permiso para editar esta tienda.');
-            return res.redirect(`/store/${store.slug}`);
+            return res.redirect(`/stores/${store._id}`);
         }
 
         if (req.body.timeSlots) {
             await TimeSlot.deleteMany({ _id: { $in: store.timeSlots } });
 
-            const timeSlots = await Promise.all(req.body.timeSlots.map(async (slot) => {
+            let timeSlots = req.body.timeSlots;
+            if (!Array.isArray(timeSlots.slot)) {
+                timeSlots.slot = [timeSlots.slot];
+                timeSlots.maxReservations = [timeSlots.maxReservations];
+            }
+
+            // Asegurarse de que maxReservations tenga el mismo número de elementos que slots
+            if (timeSlots.slot.length !== timeSlots.maxReservations.length) {
+                const firstMaxReservation = timeSlots.maxReservations[0] || '0';
+                // Rellenar maxReservations con el valor del primero si es necesario
+                while (timeSlots.maxReservations.length < timeSlots.slot.length) {
+                    timeSlots.maxReservations.push(firstMaxReservation);
+                }
+            }
+
+            timeSlots = timeSlots.slot.map((slot, index) => {
+                const maxReservations = Number(timeSlots.maxReservations[index]);
+                console.log('slot:', slot, 'maxReservations:', maxReservations);
+                if (isNaN(maxReservations)) {
+                    throw new Error('Invalid maxReservations value');
+                }
+                return {
+                    start: slot.split('-')[0],
+                    end: slot.split('-')[1],
+                    maxReservations: maxReservations
+                };
+            });
+
+            const savedTimeSlots = await Promise.all(timeSlots.map(async (slot) => {
                 const newSlot = new TimeSlot(slot);
                 await newSlot.save();
                 return newSlot._id;
             }));
-            req.body.timeSlots = timeSlots;
+
+            req.body.timeSlots = savedTimeSlots;
         }
 
         const updatedStore = await Store.findOneAndUpdate(
@@ -172,6 +223,7 @@ exports.updateStore = async (req, res) => {
         req.flash('success', `Successfully updated ${updatedStore.name}.`);
         res.redirect(`/store/${updatedStore.slug}`);
     } catch (error) {
+        console.error('Error timeSlots:', error);
         req.flash('error', 'Hubo un problema al actualizar la tienda.');
         res.redirect('back');
     }

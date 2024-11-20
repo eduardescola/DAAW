@@ -8,11 +8,14 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const helpers = require('./helpers');
 const flash = require('connect-flash');
+const methodOverride = require('method-override');
 
 require('./handlers/passport');
 
 // create our Express app
 const app = express();
+
+app.use(methodOverride('_method'));
 
 // serves up static files from the public folder. 
 app.use(express.static(path.join(__dirname, 'public')));

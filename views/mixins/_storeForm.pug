@@ -40,55 +40,42 @@ mixin storeForm(store = {})
     .mb-3
       label(for="timeSlots" class="form-label") Time Slots
       .time-slots
+        // Renderizar los timeSlots existentes
+        - const existingTimeSlots = store.timeSlots || []
+        each slot, index in existingTimeSlots
+          .time-slot
+            .mb-3
+              label(for=`timeSlot${index}` class="form-label") Time Slot
+              .form-check
+                input.form-check-input(type="checkbox" id=`timeSlot${index}` name="timeSlots[slot]" value=`${slot.start}-${slot.end}` checked)
+                label.form-check-label(for=`timeSlot${index}`) #{slot.start} - #{slot.end}
+              .mb-3
+                label(for=`timeSlotMaxReservations${index}` class="form-label") Max Reservations
+                input(class="form-control" type="number" id=`timeSlotMaxReservations${index}` name="timeSlots[maxReservations]" value=slot.maxReservations required)
+        // Plantilla para nuevos timeSlots
         .time-slot-template.hidden
-          .time-slot  <!-- Asegúrate de envolver cada bloque de tiempo en una clase 'time-slot' -->
+          .time-slot
             .mb-3
               label(for="timeSlot" class="form-label") Time Slot
-              select(class="form-control" name="timeSlots[][slot][]" onchange="checkDuplicateSlots(this)")
-                option(value="") Select a time slot
-                option(value="09:00-11:00") 09:00 - 11:00
-                option(value="11:00-13:00") 11:00 - 13:00
-                option(value="13:00-15:00") 13:00 - 15:00
-                option(value="15:00-17:00") 15:00 - 17:00
-                option(value="17:00-19:00") 17:00 - 19:00
-                option(value="19:00-21:00") 19:00 - 21:00
-            .mb-3
-              label(for="timeSlotMaxReservations" class="form-label") Max Reservations
-              input(class="form-control" type="number" name="timeSlots[][maxReservations]" required)
-            button(type="button" class="btn btn-danger remove-time-slot") Remove
-        button(type="button" class="btn btn-primary add-time-slot") Add Time Slot
-    button(type="submit" class="btn btn-primary") Save
-
-  script.
-    document.addEventListener('DOMContentLoaded', function() {
-      const timeSlotTemplate = document.querySelector('.time-slot-template');
-      const timeSlotsContainer = document.querySelector('.time-slots');
-      const addTimeSlotButton = document.querySelector('.add-time-slot');
-
-      // Añadir un nuevo slot de tiempo
-      addTimeSlotButton.addEventListener('click', function() {
-        const newTimeSlot = timeSlotTemplate.cloneNode(true);
-        newTimeSlot.classList.remove('hidden', 'time-slot-template');
-        newTimeSlot.classList.add('time-slot'); // Añadimos la clase 'time-slot' al nuevo slot
-        timeSlotsContainer.insertBefore(newTimeSlot, addTimeSlotButton);
-      });
-
-      // Eliminar un slot de tiempo
-      timeSlotsContainer.addEventListener('click', function(event) {
-        if (event.target.classList.contains('remove-time-slot')) {
-          event.target.closest('.time-slot').remove();  // Asegúrate de que el 'closest' sea '.time-slot'
-        }
-      });
-    });
-
-    // Verificar si hay slots duplicados
-    function checkDuplicateSlots(selectElement) {
-      const selectedValue = selectElement.value;
-      const allSelects = document.querySelectorAll('select[name^="timeSlots"]');
-      allSelects.forEach(select => {
-        if (select !== selectElement && select.value === selectedValue) {
-          alert('This time slot is already selected. Please choose a different one.');
-          selectElement.value = '';
-        }
-      });
-    }
+              .form-check
+                input.form-check-input(type="checkbox" id="timeSlot1" name="timeSlots[slot][]" value="09:00-11:00")
+                label.form-check-label(for="timeSlot1") 09:00 - 11:00
+                .form-check
+                input.form-check-input(type="checkbox" id="timeSlot2" name="timeSlots[slot][]" value="11:00-13:00")
+                label.form-check-label(for="timeSlot2") 11:00 - 13:00
+                .form-check
+                input.form-check-input(type="checkbox" id="timeSlot3" name="timeSlots[slot][]" value="13:00-15:00")
+                label.form-check-label(for="timeSlo3t") 13:00 - 15:00
+                .form-check
+                input.form-check-input(type="checkbox" id="timeSlot4" name="timeSlots[slot][]" value="15:00-17:00")
+                label.form-check-label(for="timeSlot4") 15:00 - 17:00
+                .form-check
+                input.form-check-input(type="checkbox" id="timeSlot5" name="timeSlots[slot][]" value="17:00-19:00")
+                label.form-check-label(for="timeSlot5") 17:00 - 19:00
+                .form-check
+                input.form-check-input(type="checkbox" id="timeSlot6" name="timeSlots[slot][]" value="19:00-21:00")
+                label.form-check-label(for="timeSlot6") 19:00 - 21:00
+              .mb-3
+                label(for="timeSlotMaxReservations" class="form-label") Max Reservations
+                input(class="form-control" type="number" name="timeSlots[maxReservations][]" required)
+            button(type="submit" class="btn btn-primary") Save
