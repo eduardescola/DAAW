@@ -5,6 +5,7 @@ require('./models/Store');
 require('./models/User');
 require('./models/Reservation');
 require('./models/Review');
+require('./models/TimeSlot');
 
 // Connect to our Database and handle any bad connections
 mongoose.connect(process.env.DATABASE).then(()=>{

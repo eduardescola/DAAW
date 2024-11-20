@@ -2,6 +2,7 @@ const multer = require('multer');
 const mongoose = require('mongoose');
 const Store = mongoose.model('Store'); 
 const Reservation = mongoose.model('Reservation');
+const TimeSlot = mongoose.model('TimeSlot');
 
 const multerOptions = { 
     storage: multer.memoryStorage(), 
@@ -65,16 +66,24 @@ exports.upload = async (req, res, next) => {
     next(); 
 }; 
 
-exports.createStore = async (req, res) => {  
-    req.body.author = req.user._id; 
-    const store = new Store(req.body);   
-    const savedStore = await store.save();   
-    console.log('Store saved!');    
-    
-    req.flash('success', `Successfully Created ${store.name}.`);    
-    
-    res.redirect(`/store/${savedStore.slug}`);  
-}; 
+exports.createStore = async (req, res) => {
+    req.body.author = req.user._id;
+    const store = new Store(req.body);
+
+    // Crear los timeSlots asociados
+    if (req.body.timeSlots) {
+        const timeSlots = await Promise.all(req.body.timeSlots.map(async (slot) => {
+            const newSlot = new TimeSlot(slot);
+            await newSlot.save();
+            return newSlot._id;
+        }));
+        store.timeSlots = timeSlots;
+    }
+
+    const savedStore = await store.save();
+    req.flash('success', `Successfully Created ${store.name}.`);
+    res.redirect(`/store/${savedStore.slug}`);
+};
 
 exports.getStoreBySlug = async (req, res, next) => {    
     const store = await Store.findOne({ slug: req.params.slug });    
@@ -128,45 +137,43 @@ exports.editStore = async (req, res) => {
   
 exports.updateStore = async (req, res) => {
     try {
-        // Verificar si el usuario es un administrador o el dueño de la tienda
         const store = await Store.findOne({ _id: req.params.id });
 
-        // Si no se encuentra la tienda, devolver un error 404
         if (!store) {
             req.flash('error', 'La tienda no fue encontrada.');
             return res.redirect('/stores');
         }
 
-        // Si el usuario no es administrador, asegurarse de que es el dueño de la tienda
         if (req.user.role !== 'admin' && store.author.toString() !== req.user._id.toString()) {
             req.flash('error', 'No tienes permiso para editar esta tienda.');
-            return res.redirect(`/stores/${store._id}`);
+            return res.redirect(`/store/${store.slug}`);
         }
 
-        // Si el usuario tiene permiso (es el dueño o admin), proceder con la actualización
+        if (req.body.timeSlots) {
+            await TimeSlot.deleteMany({ _id: { $in: store.timeSlots } });
+
+            const timeSlots = await Promise.all(req.body.timeSlots.map(async (slot) => {
+                const newSlot = new TimeSlot(slot);
+                await newSlot.save();
+                return newSlot._id;
+            }));
+            req.body.timeSlots = timeSlots;
+        }
+
         const updatedStore = await Store.findOneAndUpdate(
             { _id: req.params.id },
             req.body,
             {
-                new: true, // Devolver el objeto actualizado
-                runValidators: true // Ejecutar las validaciones del modelo
+                new: true,
+                runValidators: true
             }
         ).exec();
 
-        // Si no se ha actualizado, devolver un mensaje de error
-        if (!updatedStore) {
-            req.flash('error', 'No se pudo actualizar la tienda.');
-            return res.redirect(`/stores/${store._id}/edit`);
-        }
-
-        // Si la actualización es exitosa, mostrar mensaje de éxito
-        req.flash('success', `Se actualizó correctamente <strong>${updatedStore.name}</strong>. <a href="/store/${updatedStore.slug}">Ver tienda</a>`);
-        res.redirect(`/stores/${updatedStore._id}/edit`);
-
+        req.flash('success', `Successfully updated ${updatedStore.name}.`);
+        res.redirect(`/store/${updatedStore.slug}`);
     } catch (error) {
-        console.error(error);
-        req.flash('error', 'Ocurrió un error al actualizar la tienda.');
-        res.redirect(`/stores/${req.params.id}/edit`);
+        req.flash('error', 'Hubo un problema al actualizar la tienda.');
+        res.redirect('back');
     }
 };
 
@@ -206,7 +213,7 @@ exports.getTopStores = async (req, res) => {
 
 //*** Verify Credentials
 const confirmOwner = (store, user) => {
-    if (!(store.author == user._id || user.role === 'admin')) {
+    if (!(store.author.toString() === user._id.toString() || user.role === 'admin')) {
         throw Error('You must own the store in order to edit it');
     }
-};
+}; 

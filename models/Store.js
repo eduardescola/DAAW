@@ -38,9 +38,8 @@ const storeSchema = new mongoose.Schema({
   },
   closedDays: [String], // Días en los que el restaurante está cerrado
   timeSlots: [{
-    start: String,
-    end: String,
-    maxReservations: Number
+    type: mongoose.Schema.ObjectId,
+    ref: 'TimeSlot'
   }] // Franjas horarias y número máximo de reservas por franja
 });
 
