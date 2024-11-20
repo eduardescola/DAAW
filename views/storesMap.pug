@@ -15,8 +15,13 @@ block content
       }).addTo(map);
 
       var stores = !{JSON.stringify(stores)};
+      console.log(stores); // Verifica que los datos se están utilizando correctamente
       stores.forEach(function(store) {
+        console.log(store); // Verifica cada tienda individualmente
+        var rating = store.reviews && store.reviews.length
+          ? store.reviews.reduce((acc, review) => acc + review.rating, 0) / store.reviews.length
+          : 0;
         L.marker([store.latitude, store.longitude]).addTo(map)
-          .bindPopup('<b>' + store.name + '</b><br>Valoración: ' + store.rating);
+          .bindPopup('<b>' + store.name + '</b><br>Valoración: ' + rating.toFixed(1));
       });
     });

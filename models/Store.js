@@ -79,8 +79,15 @@ function autopopulate(next) {
   next();
 }
 
-storeSchema.pre('find', autopopulate);
-storeSchema.pre('findOne', autopopulate);
+storeSchema.pre('find', function(next) {
+  this.populate('reviews');
+  next();
+});
+
+storeSchema.pre('findOne', function(next) {
+  this.populate('reviews');
+  next();
+});
 
 storeSchema.statics.getTopStores = function() {
     return this.aggregate([

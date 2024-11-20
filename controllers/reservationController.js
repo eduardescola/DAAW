@@ -72,6 +72,20 @@ exports.cancelReservation = async (req, res) => {
   res.redirect("/reservations");
 };
 
+exports.updateReservationStatus = async (reservationId, newStatus) => {
+  try {
+    const updatedReservation = await Reservation.findByIdAndUpdate(
+      reservationId,
+      { status: newStatus },
+      { new: true }
+    );
+    return updatedReservation;
+  } catch (error) {
+    console.error(`Error updating reservation status: ${error}`);
+    throw error;
+  }
+};
+
 exports.finalizeExpiredReservations = async (req, res, next) => {
   // Obtiene la fecha actual y establece la hora a 00:00:00 para comparar solo la fecha
   const now = new Date();
@@ -89,7 +103,7 @@ exports.finalizeExpiredReservations = async (req, res, next) => {
   // Actualiza el estado de cada reserva a "finalizada"
   if (expiredReservations.length > 0) {
     const updatePromises = expiredReservations.map((reservation) =>
-      Reservation.findByIdAndUpdate(reservation._id, { status: 'finalizada' })
+      exports.updateReservationStatus(reservation._id, 'finalizada')
     );
 
     // Espera que todas las actualizaciones se completen

@@ -113,14 +113,21 @@ exports.createStore = async (req, res) => {
 };
 
 exports.getStoreBySlug = async (req, res, next) => {
-    const store = await Store.findOne({ slug: req.params.slug }).populate('timeSlots');
-    
+    const store = await Store.findOne({ slug: req.params.slug })
+        .populate('timeSlots')
+        .populate('reviews');
+
     if (!store) {
         return next();
     }
 
-    res.render('store', { title: store.name, store });
-}; 
+    // Calcular la media de las valoraciones
+    const rating = store.reviews.length
+        ? store.reviews.reduce((acc, review) => acc + review.rating, 0) / store.reviews.length
+        : 0;
+
+    res.render('store', { title: store.name, store: { ...store.toObject(), rating } });
+};
 
 exports.getStores = async (req, res) => {
     const page = req.params.page || 1;
@@ -151,8 +158,8 @@ exports.getStores = async (req, res) => {
 };
 
 exports.getStoresMap = async (req, res) => {
-    const stores = await Store.find();
-    res.render('storesMap', { title: 'Stores Map', stores: stores });
+    const stores = await Store.find().populate('reviews');
+    res.render('storesMap', { title: 'Stores Map', stores });
 };
 
 exports.editStore = async (req, res) => {
