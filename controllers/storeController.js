@@ -158,9 +158,25 @@ exports.getStores = async (req, res) => {
 };
 
 exports.getStoresMap = async (req, res) => {
+    // Obtén las tiendas con las reseñas ya pobladas
     const stores = await Store.find().populate('reviews');
-    res.render('storesMap', { title: 'Stores Map', stores });
+    
+    // Agrega el promedio de valoraciones a cada tienda
+    const storesWithRatings = stores.map(store => {
+        const reviews = store.reviews || [];
+        const averageRating = reviews.length
+            ? (reviews.reduce((sum, review) => sum + (review.rating || 0), 0) / reviews.length).toFixed(1)
+            : 0;
+        return {
+            ...store.toObject(), // Convierte el documento Mongoose a un objeto JS normal
+            averageRating,
+        };
+    });
+
+    // Renderiza la vista con los datos actualizados
+    res.render('storesMap', { title: 'Stores Map', stores: storesWithRatings });
 };
+
 
 exports.editStore = async (req, res) => {
     const store = await Store.findOne({ _id: req.params.id });
