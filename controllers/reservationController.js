@@ -98,8 +98,6 @@ exports.finalizeExpiredReservations = async (req, res, next) => {
     status: 'activa',
   });
 
-  console.log('Reservas expiradas:', expiredReservations);
-
   // Actualiza el estado de cada reserva a "finalizada"
   if (expiredReservations.length > 0) {
     const updatePromises = expiredReservations.map((reservation) =>
