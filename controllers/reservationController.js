@@ -101,7 +101,7 @@ exports.finalizeExpiredReservations = async (req, res, next) => {
   // Actualiza el estado de cada reserva a "finalizada"
   if (expiredReservations.length > 0) {
     const updatePromises = expiredReservations.map((reservation) =>
-      updateReservationStatus(reservation._id, 'finalizada')
+      exports.updateReservationStatus(reservation._id, 'finalizada')
     );
 
     // Espera que todas las actualizaciones se completen
